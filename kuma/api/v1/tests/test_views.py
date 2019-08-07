@@ -54,25 +54,24 @@ def test_get_content_based_redirect(root_doc, redirect_doc, redirect_to_self,
 
 @pytest.mark.parametrize(
     'http_method', ['put', 'post', 'delete', 'options', 'head'])
-def test_doc_api_disallowed_methods(client, api_settings, http_method):
+def test_doc_api_disallowed_methods(client, http_method):
     """HTTP methods other than GET are not allowed."""
     url = reverse('api.v1.doc', args=['en-US', 'Web/CSS'])
-    response = getattr(client, http_method)(url,
-                                            HTTP_HOST=api_settings.BETA_HOST)
+    response = getattr(client, http_method)(url)
     assert response.status_code == 405
     assert_no_cache_header(response)
 
 
-def test_doc_api_404(client, api_settings, root_doc):
+def test_doc_api_404(client, root_doc):
     """We get a 404 if we ask for a document that does not exist."""
     url = reverse('api.v1.doc', args=['en-US', 'NoSuchPage'])
-    response = client.get(url, HTTP_HOST=api_settings.BETA_HOST)
+    response = client.get(url)
     assert response.status_code == 404
     assert_no_cache_header(response)
 
 
 @pytest.mark.parametrize('ensure_contributors', (True, False))
-def test_doc_api(client, api_settings, trans_doc, cleared_cacheback_cache,
+def test_doc_api(client, trans_doc, cleared_cacheback_cache,
                  ensure_contributors):
     """On success we get document details in a JSON response."""
     if ensure_contributors:
@@ -81,7 +80,7 @@ def test_doc_api(client, api_settings, trans_doc, cleared_cacheback_cache,
         DocumentContributorsJob().refresh(trans_doc.pk)
 
     url = reverse('api.v1.doc', args=[trans_doc.locale, trans_doc.slug])
-    response = client.get(url, HTTP_HOST=api_settings.BETA_HOST)
+    response = client.get(url)
     assert response.status_code == 200
     assert_no_cache_header(response)
 
@@ -125,8 +124,8 @@ def test_doc_api(client, api_settings, trans_doc, cleared_cacheback_cache,
 
 
 @pytest.mark.parametrize('ensure_contributors', (True, False))
-def test_doc_api_for_redirect_to_doc(client, api_settings, root_doc,
-                                     redirect_doc, cleared_cacheback_cache,
+def test_doc_api_for_redirect_to_doc(client, root_doc, redirect_doc,
+                                     cleared_cacheback_cache,
                                      ensure_contributors):
     """
     Test the document API when we're requesting data for a document that
@@ -138,7 +137,7 @@ def test_doc_api_for_redirect_to_doc(client, api_settings, root_doc,
         DocumentContributorsJob().refresh(root_doc.pk)
 
     url = reverse('api.v1.doc', args=[redirect_doc.locale, redirect_doc.slug])
-    response = client.get(url, HTTP_HOST=api_settings.BETA_HOST, follow=True)
+    response = client.get(url, follow=True)
     assert response.status_code == 200
     assert_no_cache_header(response)
 
@@ -182,7 +181,7 @@ def test_doc_api_for_redirect_to_doc(client, api_settings, root_doc,
 
 
 @pytest.mark.parametrize('case', ('redirect-to-home', 'redirect-to-other'))
-def test_doc_api_for_redirect_to_non_doc(client, api_settings, redirect_to_home,
+def test_doc_api_for_redirect_to_non_doc(client, redirect_to_home,
                                          redirect_to_macros, case):
     """
     Test the document API when we're requesting data for a document that
@@ -196,7 +195,7 @@ def test_doc_api_for_redirect_to_non_doc(client, api_settings, redirect_to_home,
         expected_redirect_url = absolutify('/en-US/dashboards/macros',
                                            for_wiki_site=True)
     url = reverse('api.v1.doc', args=[doc.locale, doc.slug])
-    response = client.get(url, HTTP_HOST=api_settings.BETA_HOST)
+    response = client.get(url)
     assert response.status_code == 200
     assert_no_cache_header(response)
 
@@ -211,18 +210,17 @@ def test_doc_api_for_redirect_to_non_doc(client, api_settings, redirect_to_home,
 
 @pytest.mark.parametrize(
     'http_method', ['put', 'post', 'delete', 'options', 'head'])
-def test_whoami_disallowed_methods(client, api_settings, http_method):
+def test_whoami_disallowed_methods(client, http_method):
     """HTTP methods other than GET are not allowed."""
     url = reverse('api.v1.whoami')
-    response = getattr(client, http_method)(url,
-                                            HTTP_HOST=api_settings.BETA_HOST)
+    response = getattr(client, http_method)(url)
     assert response.status_code == 405
     assert_no_cache_header(response)
 
 
 @pytest.mark.django_db
 @pytest.mark.parametrize('timezone', ('US/Eastern', 'US/Pacific'))
-def test_whoami_anonymous(client, api_settings, timezone):
+def test_whoami_anonymous(client, settings, timezone):
     """Test response for anonymous users."""
     # Create some fake waffle objects
     Flag.objects.create(name='section_edit', authenticated=True)
@@ -233,9 +231,9 @@ def test_whoami_anonymous(client, api_settings, timezone):
     Sample.objects.create(name="sample_never", percent=0)
     Sample.objects.create(name="sample_always", percent=100)
 
-    api_settings.TIME_ZONE = timezone
+    settings.TIME_ZONE = timezone
     url = reverse('api.v1.whoami')
-    response = client.get(url, HTTP_HOST=api_settings.BETA_HOST)
+    response = client.get(url)
     assert response.status_code == 200
     assert response['content-type'] == 'application/json'
     assert response.json() == {
@@ -274,8 +272,8 @@ def test_whoami_anonymous(client, api_settings, timezone):
     [('US/Eastern', False, False, False),
      ('US/Pacific', True, True, True)],
     ids=('muggle', 'wizard'))
-def test_whoami(user_client, api_settings, wiki_user, beta_testers_group,
-                timezone, is_staff, is_superuser, is_beta_tester):
+def test_whoami(user_client, wiki_user, beta_testers_group, timezone, is_staff,
+                is_superuser, is_beta_tester):
     """Test responses for logged-in users."""
     # Create some fake waffle objects
     Flag.objects.create(name='section_edit', authenticated=True)
@@ -294,7 +292,7 @@ def test_whoami(user_client, api_settings, wiki_user, beta_testers_group,
         wiki_user.groups.add(beta_testers_group)
     wiki_user.save()
     url = reverse('api.v1.whoami')
-    response = user_client.get(url, HTTP_HOST=api_settings.BETA_HOST)
+    response = user_client.get(url)
     assert response.status_code == 200
     assert response['content-type'] == 'application/json'
     assert response.json() == {
