@@ -1,6 +1,5 @@
 //@flow
 import * as React from 'react';
-import { css } from '@emotion/core';
 
 import { getLocale, gettext } from '../l10n.js';
 import Login from './login.jsx';
