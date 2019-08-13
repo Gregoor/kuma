@@ -251,6 +251,7 @@ LOCALE_SELECTORS = {
 }
 
 
+@pytest.mark.headless
 @pytest.mark.nondestructive
 @pytest.mark.parametrize('expected,accept,cookie,param',
                          LOCALE_SELECTORS.values(),
