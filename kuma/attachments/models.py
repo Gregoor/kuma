@@ -140,6 +140,10 @@ class AttachmentRevision(models.Model):
         default=False, db_index=True,
         help_text="Did this revision come from MindTouch?")
 
+    is_s3_migrated = models.BooleanField(
+        default=False, db_index=True,
+        help_text="Has this revision been migrated to S3?")
+
     class Meta:
         verbose_name = _('attachment revision')
         verbose_name_plural = _('attachment revisions')
