@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head prefix="og: http://ogp.me/ns#">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <title>MDN Development</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="preload" href="../kuma/static/fonts/locales/ZillaSlab-Regular.subset.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="../kuma/static/fonts/locales/ZillaSlab-Bold.subset.woff2" as="font" type="font/woff2" crossorigin />
+
+    <link rel="license" href="#license">
+
+    <link rel="stylesheet" href="../kuma/static/styles/includes/_vars.scss">
+    <link rel="stylesheet" href="../kuma/static/styles/minimalist/main.scss">
+    <link rel="stylesheet" href="../kuma/static/styles/minimalist/document.scss">
+
+    <style>
+        @font-face {
+            font-family: zillaslab;
+            font-display: swap;
+            src: url("../kuma/static/fonts/locales/ZillaSlab-Regular.subset.woff2") format('woff2'),
+                 url("../kuma/static/fonts/locales/ZillaSlab-Regular.subset.woff") format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: zillaslab;
+            font-display: swap;
+            src: url("../kuma/static/fonts/locales/ZillaSlab-Bold.subset.woff2") format('woff2'),
+                 url("../kuma/static/fonts/locales/ZillaSlab-Bold.subset.woff") format('woff');
+            font-weight: bold;
+            font-style: normal;
+        }
+    </style>
+</head>
+<body>
+<div id="react-container" data-component-name="SPA"></div>
+<script src="index.js"></script>
+</body>
+</html>
