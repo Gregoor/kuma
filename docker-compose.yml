@@ -95,6 +95,8 @@ services:
       - --max-allowed-packet=100M
     volumes:
       - mysqlvolume:/var/lib/mysql
+    ports:
+      - "3307:3306"
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:6.7.1

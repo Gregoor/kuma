@@ -5,7 +5,7 @@
     "author": "Mozilla",
     "license": "MPL",
     "scripts": {
-        "start": "parcel index.html",
+        "start": "node server.js",
         "postinstall": "cd .. && npm install"
     },
     "dependencies": {
