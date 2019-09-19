@@ -527,6 +527,7 @@ STATICFILES_FINDERS = (
     'pipeline.finders.PipelineFinder',
 )
 
+AWS_DEFAULT_ACL = None
 STATICFILES_STORAGE = ('pipeline.storage.NonPackagingPipelineStorage'
                        if DEBUG else
                        'kuma.core.pipeline.storage.ManifestPipelineStorage')

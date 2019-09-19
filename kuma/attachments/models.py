@@ -8,7 +8,7 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from django_mysql.models import Model as MySQLModel
-
+from storages.backends.s3boto3 import S3Boto3Storage
 from .utils import attachment_upload_to, full_attachment_url
 
 
@@ -103,7 +103,10 @@ class AttachmentRevision(models.Model):
     attachment = models.ForeignKey(Attachment, related_name='revisions',
                                    on_delete=models.CASCADE)
 
-    file = models.FileField(upload_to=attachment_upload_to, max_length=500)
+    file = models.FileField(
+        storage=S3Boto3Storage(bucket=settings.MDN_API_S3_BUCKET_NAME),
+        upload_to=attachment_upload_to,
+        max_length=500)
 
     title = models.CharField(max_length=255, null=True, db_index=True)
 
@@ -154,7 +157,7 @@ class AttachmentRevision(models.Model):
 
     @property
     def filename(self):
-        return os.path.split(self.file.path)[-1]
+        return os.path.basename(self.file.name)
 
     def save(self, *args, **kwargs):
         super(AttachmentRevision, self).save(*args, **kwargs)
