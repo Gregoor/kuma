@@ -1681,6 +1681,10 @@ CONSTANCE_CONFIG = dict(
         'mdn-admins@mozilla.org',
         'Email address to request admin intervention'
     ),
+    USE_S3_AS_ATTACHMENT_STORAGE=(
+        False,
+        'Whether S3 should be used as the attachment storage, takes effect after a restart'
+    )
 )
 
 # Google Analytics Tracking Account Number (0 to disable)

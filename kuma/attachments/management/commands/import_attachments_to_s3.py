@@ -1,10 +1,13 @@
 import os
 from multiprocessing.pool import ThreadPool
-from django.core.management.base import BaseCommand
-from django.conf import settings
-from django.db import connection
-from kuma.attachments.models import AttachmentRevision
+
 import boto3
+from constance import config
+from django.conf import settings
+from django.core.management.base import BaseCommand
+from django.db import connection
+
+from kuma.attachments.models import AttachmentRevision
 
 REVISIONS_QUERY = """
     select id, file
@@ -25,20 +28,20 @@ class Command(BaseCommand):
             cursor.execute(REVISIONS_QUERY, [BATCH_SIZE])
             rows = cursor.fetchall()
 
+        print os.environ
         if len(rows) == 0:
-            print 'Nothing left to migrate!'
+            print 'Nothing left to migrate. Setting S3 as default storage, restart now!'
+            config.USE_S3_AS_ATTACHMENT_STORAGE = True
             return
 
         ids, filenames = zip(*rows)
 
-        s3 = boto3.client('s3',
-                          aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-                          aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
+        s3 = boto3.client('s3')
 
         def upload(filename):
             s3.upload_file(
                 os.path.join(settings.MEDIA_ROOT, filename),
-                settings.AWS_STORAGE_BUCKET_NAME,
+                settings.MDN_API_S3_BUCKET_NAME,
                 filename)
 
         pool = ThreadPool(processes=UPLOAD_PROCESSES)

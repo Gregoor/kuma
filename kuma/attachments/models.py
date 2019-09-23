@@ -1,7 +1,9 @@
 import os
 from datetime import datetime
 
+from constance import config
 from django.conf import settings
+from django.core.files.storage import default_storage
 from django.db import models
 from django.db.utils import IntegrityError
 from django.utils.encoding import python_2_unicode_compatible
@@ -9,7 +11,13 @@ from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from django_mysql.models import Model as MySQLModel
 from storages.backends.s3boto3 import S3Boto3Storage
+
 from .utils import attachment_upload_to, full_attachment_url
+
+if config.USE_S3_AS_ATTACHMENT_STORAGE:
+    attachment_storage = S3Boto3Storage(bucket=settings.MDN_API_S3_BUCKET_NAME)
+else:
+    attachment_storage = default_storage
 
 
 @python_2_unicode_compatible
@@ -104,7 +112,7 @@ class AttachmentRevision(models.Model):
                                    on_delete=models.CASCADE)
 
     file = models.FileField(
-        storage=S3Boto3Storage(bucket=settings.MDN_API_S3_BUCKET_NAME),
+        storage=attachment_storage,
         upload_to=attachment_upload_to,
         max_length=500)
 
