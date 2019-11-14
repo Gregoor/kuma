@@ -45,8 +45,8 @@ def revision(request, document_slug, document_locale, revision_id):
 
 @ensure_wiki_domain
 @never_cache
-@login_required
 @require_POST
+@csrf_exempt
 def preview(request):
     """
     Create an HTML fragment preview of the posted wiki syntax.
